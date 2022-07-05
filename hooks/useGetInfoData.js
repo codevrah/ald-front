@@ -5,7 +5,11 @@ export function useGetInfoData() {
     const [votes, setVotes] = useState([]);
 
     useEffect(() => {
-        setVotes(getInfoData)
+        async function getInfo(){
+            const data = await getInfoData()
+            setVotes(data)
+        }
+        getInfo()
     }, []);
 
     return { votes };

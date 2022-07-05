@@ -2,20 +2,34 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useSession, signIn } from 'next-auth/react'
 import { useGetInfoData } from '../hooks/useGetInfoData';
-import { useGetVotesData } from '../hooks/useGetVotesData';
 import createVote from '../services/createVote';
+import { useEffect } from 'react';
+import getUserHasVoted from '../services/getUserHasVoted';
+import DisqusComments from '../components/DisqusComments';
+import Link from 'next/link';
+
+const questionID = '62c26d22b006199562243905'
 
 export default function Home() {
   const { data: session } = useSession();
   const { votes: votesInfo } = useGetInfoData();
-  const { votes: votesData } = useGetVotesData();
 
-  const handleClick = (e) => {
-    e.preventDefault()
+  useEffect(() => {
+    if(session) {
+      const { accessToken } = session;
+      const response = getUserHasVoted(
+        accessToken, questionID
+      );
+    }
+  }, [session])
 
+  async function handleClick(type) {
     if(session){
-      // const { vote } = createVote({ user: session.user, type: 'up' })
-      console.log(session)
+      const { accessToken } = session;
+      const { vote } = await createVote({ 
+        question: questionID, type: type
+      }, accessToken)
+      console.log(vote)
     }
     else{
       signIn()
@@ -34,22 +48,41 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        {session?.user.id}
-        <p className={styles.description}>
+        <h1>
           ¿Estás a favor o en contra del comunismo?
-        </p>
-
-        <h1 className={styles.title}>
-          11,000,001
-          <small className={styles.votes}>votos</small> 
         </h1>
 
-        <div className={styles.progress}>
-          <div className={styles.with} style={{width: '35%'}}>35%</div>
-          <div className={styles.withOut} style={{width: '65%'}}>65%</div>
+        <h2>
+          {votesInfo.total ?? 0}
+          <small> votos</small> 
+        </h2>
+
+        <div>
+          <div>{votesInfo.inFavorPercent ?? 0}% a favor</div>
+          <div>{votesInfo.againstPercent ?? 0}% en contra</div>
         </div>
 
-        <button onClick={handleClick} className={styles.glowOnHover} type="button">Votar !</button>
+        <div>
+          Quedan {Math.max(100 - (votesInfo.votesLeft ?? 0), 1)} votos para actualizar los datos
+        </div>
+
+        <div>
+          <Link href='/users'>
+            <a> Ver Votantes </a>
+          </Link>
+        </div>
+
+        {
+          session ? 
+            <>
+              <button onClick={() => handleClick('inFavor')} type="button">A Favor !</button>
+              <button onClick={() => handleClick('against')} type="button">En Contra !</button>
+            </>
+          : 
+            <button onClick={signIn} type="button">Login</button>
+        }
+
+        <DisqusComments questionID={questionID} />
       </main>
     </div>
   )
