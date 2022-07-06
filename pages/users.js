@@ -1,17 +1,23 @@
-import Link from 'next/link';
-import { useGetVotesData } from '../hooks/useGetVotesData';
+import Link from 'next/link'
+import { useVotes } from '../hooks/useVotes'
+
 import styles from '../styles/Home.module.css'
 
-const questionID = '62c26d22b006199562243905'
+import Seo from '../components/Seo'
+import { USERSSEO } from '../../config/seo'
+
+import { questionID } from '../../config'
 
 export default function Users() {
-    const { votes } = useGetVotesData(questionID);
+    const { votes, loading } = useVotes(questionID)
 
     return (
         <div className={styles.container}>
+            <Seo {...USERSSEO} />
+
             <div className={styles.main}>
                 <div className={styles.gallery}>
-                    {votes?.map(vote => <img key={vote.user.avatar} src={vote.user.avatar} />)}
+                    {loading ? "Cargando..." : votes?.map(vote => <img key={vote.user.avatar} src={vote.user.avatar} />)}
                 </div>
                 <Link href='/'>
                     <a> Inicio </a>
