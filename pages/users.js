@@ -4,9 +4,9 @@ import { useVotes } from '../hooks/useVotes'
 import styles from '../styles/Home.module.css'
 
 import Seo from '../components/Seo'
-import { USERSSEO } from '../../config/seo'
+import { USERSSEO } from '../config/seo'
 
-import { questionID } from '../../config'
+import { questionID } from '../config'
 
 export default function Users() {
     const { votes, loading } = useVotes(questionID)

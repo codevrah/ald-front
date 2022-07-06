@@ -12,9 +12,9 @@ import VotesActions from '../components/VotesActions';
 import AuthControls from '../components/AuthControls';
 
 import Seo from '../components/Seo';
-import { INDEXSEO } from '../../config/seo';
+import { INDEXSEO } from '../config/seo';
 
-import { questionID } from '../../config';
+import { questionID } from '../config';
 
 export default function Home() {
   const { data: session } = useSession();
